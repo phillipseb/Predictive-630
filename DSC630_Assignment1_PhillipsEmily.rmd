@@ -1,0 +1,137 @@
+---
+title: "Assignment 1.2"
+author: "Emily Phillips"
+date: "11/30/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Using the US Bureau of Labor Statistics data, choose a dataset that interests you. Then generate summary statistics for 2 variables, plot some of the features (e.g., histograms, box plots, density plots, etc.) of several variables, and save the data locally as CSV files.
+
+```{r data, echo=TRUE,results='hide'}
+library(readxl)
+
+#reading in dataset from excel file
+avg_hourly <- read_excel("avg_hourly_earnings_all.xlsx")
+head(avg_hourly)
+
+#marking the Year column as a factor
+avg_hourly$Year <- factor(avg_hourly$Year)
+avg_hourly$Year
+```
+
+```{r summ_2, echo=TRUE}
+# mean,median,25th and 75th quartiles,min,max for Jan
+print("Summary Statistics for 'Jan' variable")
+#handling error in dimnames with as.array
+summ_Jan <- as.array(summary(avg_hourly$Jan))
+print(summ_Jan)
+
+# mean,median,25th and 75th quartiles,min,max for Jun
+cat("\nSummary Statistics for 'Jun' variable\n")
+#handling error in dimnames
+summ_Jun <- as.array(summary(avg_hourly$Jun))
+print(summ_Jun)
+```
+I found the summary statistics for two of the month variables: 'Jan' (January) and 'Jun' (June). From looking over the values, they have the almost the same median value, but are just slightly different in terms of the range of their numerical distributions. They also have slightly different mean values but as we'll see with their histograms below, as the distribution is not normal, we will look more at the medians rather than the means. 
+
+January has a slightly lower minimum and maximum than January; however, they mostly overlap which shows that they are not very different in what they represent. We can better visualize this with the boxplots below!
+
+
+```{r plot1, echo=TRUE}
+#histogram of few variables
+#'Jan' variable as we have summary
+hist(avg_hourly$Jan,breaks=6)
+
+#histogram of 'Jun' variable
+hist(avg_hourly$Jun,breaks=6)
+
+#Distributions are more left-skewed --> more values at the lower end of the scale, lower average hourly earnings per month for all employees
+#Range only goes from 22.85 to 29.92, not a huge range but this could be standard for salaries depending on the level of the surveyed employees
+
+#boxplot of other months
+#November vs. December
+boxplot(avg_hourly$Nov)
+
+boxplot(avg_hourly$Dec)
+
+#Just slight difference in boxplots for November and December --> overlap in central 50% --> not a significant difference between the two groups
+```
+Both histograms are mostly positive-skewed, with more values at the lower end of the distribution. This shows that a majority of employees have average hourly earnings around ~$22-$25. There is also an outlier in the 'Jun' distribution at about $28, showing that this earning is not well-represented for the private employees. As this distribution represents data from 2011-2021, we can also see that the majority of the years was spent at this lower-end; however, with some years, the average hourly earnings increased which could be due to growth for a company and how they performed for that given year. 
+
+The histogram for January appears to neither be normal nor uniform. It has spikes, which could convey that transformations are needed on the variable.
+
+In terms of the boxplots as mentioned above, the variables mostly overlap in their spreads of distribution. As their medians are the same, it shows that the groups from November and December are not significantly different in their values of employees' average hourly earnings. There is not a significant difference between what people make in January compared to what they make in June, which makes sense since most promotions or changes in earnings happen towards the beginning or the end of a year.
+
+```{r plot2, echo=TRUE}
+#line plot of one of the variables to show time-series
+library(ggplot2)
+ggplot(avg_hourly,aes(x=Year,y=Jan,group=1))+ geom_line()
+
+ggplot(avg_hourly,aes(x=Year,y=Apr,group=1))+ geom_line()
+
+ggplot(avg_hourly,aes(x=Year,y=Jul,group=1))+ geom_line()
+
+ggplot(avg_hourly,aes(x=Year,y=Dec,group=1))+ geom_line()
+```
+
+
+I wanted to look into one month from each quarter of the year to visualize the change over the years per month of total average hourly earnings for all private employees. From each of the line charts, it is clear that from 2011-2021 for each month, the total average hourly earnings experienced an increase. The increase was by about $8, which can represent a big change in overall salaray for employees! From the minimum of $22 hourly earnings which could be a ~45,760 yearly salary to $30 hourly earnings for a ~$62,400 salary, that can lead to quite a shift in one's lifestyle and is definitely money that matters. The months of April and July even experienced a maximum of earnings about $30, which can show some shift in those months that could be explored even more based on other data characteristics. 
+
+```{r csv, echo=TRUE,results='hide'}
+#writing dataset to csv
+write.csv(avg_hourly,'avg_hourly.csv')
+
+#writing summary statistics to csv for January and June variables
+write.csv(summ_Jan, file = 'summary_January.csv')
+
+write.csv(summ_Jun, file = 'summary_June.csv')
+```
+
+Use the same dataset within the same website to explore some bivariate relations (e.g. bivariate plot, correlation, table cross table etc.)
+
+```{r bivar, echo=TRUE}
+#August data
+aug_data <- avg_hourly$Aug
+
+#September data
+sep_data <- avg_hourly$Sep
+
+#correlation between August and September average hourly earnings from 2011-2016
+cat("Correlation between August data and September data\n")
+cor(aug_data,sep_data)
+
+#scatter plot to represent correlation, change in values
+plot(aug_data,sep_data)
+```
+```{r bivar2, echo=TRUE}
+#correlation plot for the entire dataset
+res <- cor(avg_hourly[,2:13])
+round(res,2)
+```
+
+When looking at the bivariate relations between August average hourly earnings from 2011-2021, and the September average hourly earnings, it turns out they have a correlation of 0.9998, which is essential 1.0 and a perfect positive correlation. This relationship is due to the fact that as the average hourly earnings in August increases year-to-year, the September average hourly earnings increases as well at basically the same race/pace. This high correlation though could indicate redundancy in the data, which should be considered. Also, correlation does not imply causation. Although we see that the average hourly earnings increase over the years for both months, it does not mean that there is a cause-and-effect relationship between the two. 
+
+The months year-to-year can differ immensely in the events that occur, and although it is good to see that the average hourly earnings increase which can show that things improve financially by 2021, it does not mean that August hourly earnings impact September hourly earnings. However, they could depending on various other factors that we'd have to look into!
+
+I also created a correlation matrix for all of the numerical Month variables. Their correlations are extremely high and similar to what was stated above, perfect positive correlations. This could demonstrate redundancy in the data; however, because we are looking at time-series data, this can be understandable. There may not be much change in data from month-to-month. However, when we look at the changes from year to year, we see more of a significant difference and change over time. Therefore, while the months may be redundant in their average hourly earnings, the years really demonstrate where those earnings start to change and increase. 
+
+Generate a summary report. Make sure to include: summary for every variable, structure and type of data elements, discuss four results of your data.
+
+```{r summ_rep, echo=TRUE}
+
+#summary for every variable in dataset
+cat("Summary for every variable\n")
+summary(avg_hourly)
+
+#structure and type of data elements
+cat("\nType of data elements\n")
+str(avg_hourly)
+```
+Since the column 'Year' represents a limited number of values (2011-2021), I converted it from a numeric data type to a factor, so it can better represent the categories/groupings in the data. In terms of the summary for its variable, the values are 1 since the factor appears only once in the data set for each month of data. It represents a count of one. 
+The other variables however, which represent the months in the year, are numerical as they convey the total average hourly earnings of all private employees (seasonally adjusted). From looking over the summary statistics, there really is not a significant difference between the range of values from 2011-2021, as mentioned above with the visualizations for single and bivariate relations. The average hourly earnings mostly lie between $22-$30, and there do not seem to be any significant outliers outside of this distribution. I think this consistency in the data from year-to-year shows how earnings don't vary very much for employees, especially at certain levels of an organization. Salaries are rather standardized especially within corporate organizations, so it makes sense that there is not a drastic difference from month-to-month. However, I think the maximums in the monthly values show how during certain years, there can be an increase in earnings based on certain factors like promotions, company pay-scale changes, etc. I think these can be good indicators of company performance over the years and how it impacts the earnings that employees make! The yearly changes depict more significance than the monthly changes, it seems. 
+There are two missing values: one in the 'Nov' column and the other in the 'Dec'. As this is a small dataset of only 11 rows, one missing value could cause an impact in our modeling of the data. We would have to figure out how to handle these missing values when moving forward. 
+The structure of the data is 11 x 13, 11 rows by 13 columns. The eleven rows go from years 2011-2021, and the columns are: Year, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov and Dec. It is a rather small dataset, but since it represents time-series data, we wouldn't expect for the data to be too large, since we are just looking at data within a certain period of time. This data represents yearly data at the month perspective for those average hourly earnings of private employees. 
