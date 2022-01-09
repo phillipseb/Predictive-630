@@ -2,7 +2,9 @@
 title: "Assignment 1.2"
 author: "Emily Phillips"
 date: "11/30/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +13,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Using the US Bureau of Labor Statistics data, choose a dataset that interests you. Then generate summary statistics for 2 variables, plot some of the features (e.g., histograms, box plots, density plots, etc.) of several variables, and save the data locally as CSV files.
 
-```{r data, echo=TRUE,results='hide'}
+
+
+My data source can be found at https://data.bls.gov/cgi-bin/surveymost. It represents data from 2011 to 2021 for monthly average hourly earnings of all employees, total private, and seasonally adjusted.
+
+```{r data, echo=TRUE}
 library(readxl)
 
 #reading in dataset from excel file
@@ -38,7 +44,7 @@ print(summ_Jun)
 ```
 I found the summary statistics for two of the month variables: 'Jan' (January) and 'Jun' (June). From looking over the values, they have the almost the same median value, but are just slightly different in terms of the range of their numerical distributions. They also have slightly different mean values but as we'll see with their histograms below, as the distribution is not normal, we will look more at the medians rather than the means. 
 
-January has a slightly lower minimum and maximum than January; however, they mostly overlap which shows that they are not very different in what they represent. We can better visualize this with the boxplots below!
+January has a slightly lower minimum and maximum than January; however, they mostly overlap which shows that they are not very different in what they represent. We can better visualize this with the box plots below!
 
 
 ```{r plot1, echo=TRUE}
@@ -60,11 +66,11 @@ boxplot(avg_hourly$Dec)
 
 #Just slight difference in boxplots for November and December --> overlap in central 50% --> not a significant difference between the two groups
 ```
-Both histograms are mostly positive-skewed, with more values at the lower end of the distribution. This shows that a majority of employees have average hourly earnings around ~$22-$25. There is also an outlier in the 'Jun' distribution at about $28, showing that this earning is not well-represented for the private employees. As this distribution represents data from 2011-2021, we can also see that the majority of the years was spent at this lower-end; however, with some years, the average hourly earnings increased which could be due to growth for a company and how they performed for that given year. 
+Both histograms are mostly positive-skewed, with more values at the lower end of the distribution. This shows that a majority of employees have average hourly earnings around ~$22-$25. There is also a gap in the data in the 'Jun' distribution at about $28, showing that this earning is not well-represented for the private employees. As this distribution represents data from 2011-2021, we can also see that the majority of the years was spent at this lower-end; however, with some years, the average hourly earnings increased which could be due to growth for a company and how they performed for that given year. 
 
-The histogram for January appears to neither be normal nor uniform. It has spikes, which could convey that transformations are needed on the variable.
+The histogram for January appears to neither be normal nor uniform. It has spikes, which could convey that transformations are needed on the variable. The distribution for June is not normal either. We cannot assume a normal distribution with these variables. 
 
-In terms of the boxplots as mentioned above, the variables mostly overlap in their spreads of distribution. As their medians are the same, it shows that the groups from November and December are not significantly different in their values of employees' average hourly earnings. There is not a significant difference between what people make in January compared to what they make in June, which makes sense since most promotions or changes in earnings happen towards the beginning or the end of a year.
+In terms of the boxplots, the variables mostly overlap in their spreads of distribution. As their medians are the same, it shows that the groups from November and December are not significantly different in their values of employees' average hourly earnings. There is not a significant difference between what people make in November compared to what they make in December, which makes sense since most promotions or changes in earnings happen towards the beginning or the end of a year. We might expect to see some sort of difference between January and December then (something to investigate). The boxplots also show a skewness towards the lower values in the range of the distribution, visualizing as well the positive skewness of the numerical variables.
 
 ```{r plot2, echo=TRUE}
 #line plot of one of the variables to show time-series
@@ -80,6 +86,10 @@ ggplot(avg_hourly,aes(x=Year,y=Dec,group=1))+ geom_line()
 
 
 I wanted to look into one month from each quarter of the year to visualize the change over the years per month of total average hourly earnings for all private employees. From each of the line charts, it is clear that from 2011-2021 for each month, the total average hourly earnings experienced an increase. The increase was by about $8, which can represent a big change in overall salaray for employees! From the minimum of $22 hourly earnings which could be a ~45,760 yearly salary to $30 hourly earnings for a ~$62,400 salary, that can lead to quite a shift in one's lifestyle and is definitely money that matters. The months of April and July even experienced a maximum of earnings about $30, which can show some shift in those months that could be explored even more based on other data characteristics. 
+
+It is also difficult with the December data, as we don't have values yet for 2021! Therefore, we can only assume what will happen and with some extrapolation, we could possibly see that the average hourly earnings for all private employees will continue to increase in 2021 for the month.
+
+In terms of my above observation as well with there being a significant difference between January and December earnings from year-to-year, from comparing the line charts, it seems that the slope for December increases at a slightly faster speed than the slope for January, potentially providing more clarity around the fact that the average hourly earnings will tend to increase at the end of the years with company bonuses, promotions, etc. 
 
 ```{r csv, echo=TRUE,results='hide'}
 #writing dataset to csv
@@ -131,6 +141,7 @@ summary(avg_hourly)
 cat("\nType of data elements\n")
 str(avg_hourly)
 ```
+
 Since the column 'Year' represents a limited number of values (2011-2021), I converted it from a numeric data type to a factor, so it can better represent the categories/groupings in the data. In terms of the summary for its variable, the values are 1 since the factor appears only once in the data set for each month of data. It represents a count of one. 
 The other variables however, which represent the months in the year, are numerical as they convey the total average hourly earnings of all private employees (seasonally adjusted). From looking over the summary statistics, there really is not a significant difference between the range of values from 2011-2021, as mentioned above with the visualizations for single and bivariate relations. The average hourly earnings mostly lie between $22-$30, and there do not seem to be any significant outliers outside of this distribution. I think this consistency in the data from year-to-year shows how earnings don't vary very much for employees, especially at certain levels of an organization. Salaries are rather standardized especially within corporate organizations, so it makes sense that there is not a drastic difference from month-to-month. However, I think the maximums in the monthly values show how during certain years, there can be an increase in earnings based on certain factors like promotions, company pay-scale changes, etc. I think these can be good indicators of company performance over the years and how it impacts the earnings that employees make! The yearly changes depict more significance than the monthly changes, it seems. 
 There are two missing values: one in the 'Nov' column and the other in the 'Dec'. As this is a small dataset of only 11 rows, one missing value could cause an impact in our modeling of the data. We would have to figure out how to handle these missing values when moving forward. 
